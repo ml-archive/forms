@@ -4,7 +4,7 @@ import Validation
 /// Represents a field for an HTML form
 public struct FormField<V: Validator> where V.Input: NodeRepresentable {
     public let label: String?
-    public let inputValue: V.Input?
+    public let value: V.Input?
     public let validator: V?
     public let isOptional: Bool
 
@@ -15,7 +15,7 @@ public struct FormField<V: Validator> where V.Input: NodeRepresentable {
         isOptional: Bool = false
     ) {
         self.label = label
-        self.inputValue = value
+        self.value = value
         self.validator = validator
         self.isOptional = isOptional
     }
@@ -30,7 +30,7 @@ extension FormField {
         return FieldSetEntry(
             key: key,
             label: label,
-            value: inputValue,
+            value: value,
             errors: errorReasons
         )
     }
@@ -49,9 +49,9 @@ extension FormField {
 extension FormField {
     fileprivate var errorReasons: [String] {
         do {
-            if let validator = validator, let value = inputValue {
+            if let validator = validator, let value = value {
                 try validator.validate(value)
-            } else if inputValue == nil, !isOptional {
+            } else if value == nil, !isOptional {
                 let label = self.label ?? "Value"
                 return ["\(label) cannot be empty."]
             }
