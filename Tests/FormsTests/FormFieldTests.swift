@@ -5,7 +5,7 @@ import XCTest
 
 class FormFieldTests: TestCase {
     func testThatAllValuesCanBeEmpty() {
-        let formField = FormField<TestValidator<String>, String>(isOptional: true)
+        let formField = FormField<TestValidator<String>>(isOptional: true)
 
         let fieldSetEntry = formField.makeFieldSetEntry(withKey: "")
 
@@ -65,7 +65,7 @@ class FormFieldTests: TestCase {
 
 
     func testThatNonOptionalFormFieldWithoutLabelOrValueProducesGenericError() {
-        let formField = FormField<TestValidator<String>, String>()
+        let formField = FormField<TestValidator<String>>()
         let fieldSetEntry = formField.makeFieldSetEntry(withKey: "")
         XCTAssertEqual(
             fieldSetEntry.errors,
@@ -74,20 +74,12 @@ class FormFieldTests: TestCase {
     }
 
     func testThatNonOptionalFormFieldWithLabelAndNoValueProducesErrorWithLabelInMessage() {
-        let formField = FormField<TestValidator<String>, String>(label: "Name")
+        let formField = FormField<TestValidator<String>>(label: "Name")
         let fieldSetEntry = formField.makeFieldSetEntry(withKey: "")
         XCTAssertEqual(
             fieldSetEntry.errors,
             ["Name cannot be empty."]
         )
-    }
-
-    func testThatOutputValueGetsTransformed() {
-        let formField = FormField<TestValidator<String>, Int>(
-            value: "123",
-            transform: { $0.int }
-        )
-        XCTAssertEqual(formField.outputValue, 123)
     }
 }
 

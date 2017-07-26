@@ -46,8 +46,8 @@ class FormTests: TestCase {
 // Mark: Helper
 
 struct UserForm {
-    let name: FormField<Count<String>, String>
-    let birthyear: FormField<Compare<Int>, Int>
+    let name: FormField<Count<String>>
+    let birthyear: FormField<Compare<Int>>
 
     init(name: String? = nil, birthyear: Int? = nil) {
         self.name = FormField(
