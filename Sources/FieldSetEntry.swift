@@ -39,7 +39,7 @@ extension FieldSetEntry: NodeRepresentable {
         }
 
         if let value = value {
-            node["value"] = try value.makeNode(in: nil)
+            node["value"] = try value.makeNode(in: context)
         }
 
         if !isValid {
