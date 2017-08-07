@@ -1,5 +1,25 @@
 import HTTP
 import Node
+import Vapor
+
+extension ViewData {
+    public init(
+        fieldSet: Node? = nil,
+        request: Request? = nil,
+        other: ViewDataRepresentable
+    ) throws {
+        var viewData = try other.makeViewData()
+        
+        if let fieldSet = fieldSet {
+            viewData["fieldset"] = ViewData(fieldSet)
+        }
+        if let request = request {
+            viewData["request"] = try ViewData(request.makeNode(in: nil))
+        }
+        
+        self = viewData
+    }
+}
 
 // MARK: Node
 extension Node {
