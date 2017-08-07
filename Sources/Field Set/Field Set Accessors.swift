@@ -1,32 +1,17 @@
 import HTTP
 import Node
-import Vapor
+import Sessions
 
-extension ViewData {
-    public init(
-        fieldSet: Node? = nil,
-        request: Request? = nil,
-        other: ViewDataRepresentable
-    ) throws {
-        var viewData = try other.makeViewData()
-        
-        if let fieldSet = fieldSet {
-            viewData["fieldset"] = ViewData(fieldSet)
+// MARK: Session
+
+extension Session {
+    public var fieldSet: Node? {
+        get {
+            return data[fieldSetStorageKey]
         }
-        if let request = request {
-            viewData["request"] = try ViewData(request.makeNode(in: nil))
+        set {
+            data[fieldSetStorageKey] = newValue
         }
-        
-        self = viewData
-    }
-}
-
-// MARK: Node
-extension Node {
-
-    /// Key that views expect the field set to exist
-    public static var fieldSetViewDataKey: String {
-        return "fieldset"
     }
 }
 
