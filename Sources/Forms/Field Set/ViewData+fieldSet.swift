@@ -13,7 +13,8 @@ extension ViewData {
             viewData["request"] = ViewData(try request.makeNode(in: nil))
         }
         if let fieldSet = fieldSet {
-            viewData["fieldSet"] = ViewData(fieldSet)
+            // the key is not camelCased for backwards compatibility
+            viewData["fieldset"] = ViewData(fieldSet)
         }
         self = viewData
     }
