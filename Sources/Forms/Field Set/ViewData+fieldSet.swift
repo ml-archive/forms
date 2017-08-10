@@ -8,7 +8,7 @@ extension ViewData {
         request: Request? = nil,
         other: ViewDataRepresentable? = nil
     ) throws {
-        var viewData = try other?.makeViewData() ?? ViewData()
+        var viewData = try other?.makeViewData() ?? ViewData([:])
         if let request = request {
             viewData["request"] = ViewData(try request.makeNode(in: nil))
         }
@@ -16,5 +16,17 @@ extension ViewData {
             viewData["fieldSet"] = ViewData(fieldSet)
         }
         self = viewData
+    }
+    
+    public init(
+        fieldSet: Node? = nil,
+        request: Request? = nil,
+        node: NodeRepresentable
+    ) throws {
+        try self.init(
+            fieldSet: fieldSet,
+            request: request,
+            other: ViewData(node.makeNode(in: nil))
+        )
     }
 }

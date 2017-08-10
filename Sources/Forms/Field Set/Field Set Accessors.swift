@@ -36,7 +36,7 @@ extension HasStorage {
         }
     }
 
-    /// Sets the field set on the `Response` and returns itself.
+    /// Sets the field set and returns itself.
     public func setFieldSet(_ fieldSet: Node?) -> Self {
         storage[fieldSetStorageKey] = fieldSet
         return self
