@@ -51,11 +51,13 @@ struct UserForm {
 
     init(name: String? = nil, birthyear: Int? = nil) {
         self.name = FormField(
+            key: "name",
             label: "Name",
             value: name,
             validator: .containedIn(low: 1, high: 10)
         )
         self.birthyear = FormField(
+            key: "birthyear",
             label: "Year of birth",
             value: birthyear,
             validator: .containedIn(low: 1900, high: 2017)
@@ -64,10 +66,7 @@ struct UserForm {
 }
 
 extension UserForm: Form {
-    var fieldSetEntries: [FieldSetEntry] {
-        return [
-            name.makeFieldSetEntry(withKey: "name"),
-            birthyear.makeFieldSetEntry(withKey: "birthyear")
-        ]
+    var fields: [FieldSetEntryRepresentable] {
+        return [name, birthyear]
     }
 }

@@ -3,17 +3,20 @@ import Validation
 
 /// Represents a field for an HTML form
 public struct FormField<V: Validator> where V.Input: NodeRepresentable {
+    public let key: String
     public let label: String?
     public let value: V.Input?
-    public let validator: V?
+    public let validator: V
     public let isOptional: Bool
 
     public init(
+        key: String,
         label: String? = nil,
         value: V.Input? = nil,
-        validator: V? = nil,
+        validator: V,
         isOptional: Bool = false
     ) {
+        self.key = key
         self.label = label
         self.value = value
         self.validator = validator
@@ -21,35 +24,16 @@ public struct FormField<V: Validator> where V.Input: NodeRepresentable {
     }
 }
 
-// MARK: FormField Extensions
+// MARK: FieldSetEntryRepresentable
 
-extension FormField {
-
-    /// Creates FieldSetEntry value from FormField with given key
-    public func makeFieldSetEntry(withKey key: String) -> FieldSetEntry {
-        return FieldSetEntry(
-            key: key,
-            label: label,
-            value: value,
-            errors: errorReasons
-        )
+extension FormField: FieldSetEntryRepresentable {
+    public var node: NodeRepresentable? {
+        return value
     }
-
-    /// Returns a copy with containing the given value
-    public func settingValue(to value: V.Input?) -> FormField {
-        return FormField(
-            label: label,
-            value: value,
-            validator: validator,
-            isOptional: isOptional
-        )
-    }
-}
-
-extension FormField {
-    fileprivate var errorReasons: [String] {
+    
+    public var errorReasons: [String] {
         do {
-            if let validator = validator, let value = value {
+            if let value = value {
                 try validator.validate(value)
             } else if value == nil, !isOptional {
                 let label = self.label ?? "Value"

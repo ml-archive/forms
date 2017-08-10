@@ -5,9 +5,13 @@ import XCTest
 
 class FormFieldTests: TestCase {
     func testThatAllValuesCanBeEmpty() {
-        let formField = FormField<TestValidator<String>>(isOptional: true)
+        let formField = FormField(
+            key: "",
+            validator: TestValidator<String>(),
+            isOptional: true
+        )
 
-        let fieldSetEntry = formField.makeFieldSetEntry(withKey: "")
+        let fieldSetEntry = formField.makeFieldSetEntry()
 
         XCTAssertNil(fieldSetEntry.label)
         XCTAssertNil(fieldSetEntry.value)
@@ -16,23 +20,30 @@ class FormFieldTests: TestCase {
 
     func testThatAllValuesCanBeSet() throws {
         let formField = FormField(
+            key: "",
             label: "Label",
             value: "value",
-            validator: TestValidator<String>())
+            validator: TestValidator<String>()
+        )
 
-        let fieldSetEntry = formField.makeFieldSetEntry(withKey: "")
+        let fieldSetEntry = formField.makeFieldSetEntry()
+        let value = try fieldSetEntry.value?.makeNode(in: nil)
 
         XCTAssertEqual(fieldSetEntry.label, "Label")
-        try XCTAssertEqual(fieldSetEntry.value?.makeNode(in: nil), .string("value"))
+        XCTAssertEqual(value, .string("value"))
         XCTAssertEqual(fieldSetEntry.errors.count, 0)
     }
 
     func testThatFieldSetFromFormFieldWithValueWithOneErrorSetsError() {
         let validator = TestValidator<String>(errorReasons: ["Invalid"])
 
-        let formField = FormField(value: "value", validator: validator)
+        let formField = FormField(
+            key: "",
+            value: "value",
+            validator: validator
+        )
 
-        let fieldSetEntry = formField.makeFieldSetEntry(withKey: "")
+        let fieldSetEntry = formField.makeFieldSetEntry()
 
         XCTAssertEqual(fieldSetEntry.errors, ["Invalid"])
     }
@@ -42,9 +53,13 @@ class FormFieldTests: TestCase {
             errorReasons: ["Invalid", "Invalid again"]
         )
 
-        let formField = FormField(value: "value", validator: validator)
+        let formField = FormField(
+            key: "",
+            value: "value",
+            validator: validator
+        )
 
-        let fieldSetEntry = formField.makeFieldSetEntry(withKey: "")
+        let fieldSetEntry = formField.makeFieldSetEntry()
 
         XCTAssertEqual(fieldSetEntry.errors, ["Invalid", "Invalid again"])
     }
@@ -54,9 +69,13 @@ class FormFieldTests: TestCase {
             error: NSError(domain: "", code: 0)
         )
 
-        let formField = FormField(value: "value", validator: validator)
+        let formField = FormField(
+            key: "",
+            value: "value",
+            validator: validator
+        )
 
-        let fieldSetEntry = formField.makeFieldSetEntry(withKey: "")
+        let fieldSetEntry = formField.makeFieldSetEntry()
 
         XCTAssertEqual(
             fieldSetEntry.errors,
@@ -65,8 +84,9 @@ class FormFieldTests: TestCase {
 
 
     func testThatNonOptionalFormFieldWithoutLabelOrValueProducesGenericError() {
-        let formField = FormField<TestValidator<String>>()
-        let fieldSetEntry = formField.makeFieldSetEntry(withKey: "")
+        let validator = TestValidator<String>()
+        let formField = FormField(key: "", validator: validator)
+        let fieldSetEntry = formField.makeFieldSetEntry()
         XCTAssertEqual(
             fieldSetEntry.errors,
             ["Value cannot be empty."]
@@ -74,8 +94,13 @@ class FormFieldTests: TestCase {
     }
 
     func testThatNonOptionalFormFieldWithLabelAndNoValueProducesErrorWithLabelInMessage() {
-        let formField = FormField<TestValidator<String>>(label: "Name")
-        let fieldSetEntry = formField.makeFieldSetEntry(withKey: "")
+        let validator = TestValidator<String>()
+        let formField = FormField<TestValidator<String>>(
+            key: "",
+            label: "Name",
+            validator: validator
+        )
+        let fieldSetEntry = formField.makeFieldSetEntry()
         XCTAssertEqual(
             fieldSetEntry.errors,
             ["Name cannot be empty."]

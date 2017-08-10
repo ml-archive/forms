@@ -2,7 +2,7 @@ import Node
 
 /// Types conforming to this protocol can be represented as a Field Set
 public protocol Form {
-    var fieldSetEntries: [FieldSetEntry] { get }
+    var fields: [FieldSetEntryRepresentable] { get }
 }
 
 extension Form {
@@ -20,6 +20,10 @@ extension Form {
             }
         }
         return true
+    }
+    
+    private var fieldSetEntries: [FieldSetEntry] {
+        return fields.map { $0.makeFieldSetEntry() }
     }
 }
 
