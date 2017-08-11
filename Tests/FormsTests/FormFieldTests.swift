@@ -4,10 +4,12 @@ import Validation
 import XCTest
 
 class FormFieldTests: TestCase {
+    let testValidator = TestValidator<String>()
+    
     func testThatAllValuesCanBeEmpty() {
         let formField = FormField(
             key: "",
-            validator: TestValidator<String>(),
+            validator: testValidator,
             isOptional: true
         )
 
@@ -20,13 +22,16 @@ class FormFieldTests: TestCase {
 
     func testThatAllValuesCanBeSet() throws {
         let formField = FormField(
-            key: "",
+            key: "key",
             label: "Label",
             value: "value",
-            validator: TestValidator<String>()
+            validator: testValidator
         )
 
         let fieldSetEntry = formField.makeFieldSetEntry()
+        
+        XCTAssertEqual(fieldSetEntry.key, "key")
+        
         let value = try fieldSetEntry.value?.makeNode(in: nil)
 
         XCTAssertEqual(fieldSetEntry.label, "Label")
@@ -84,8 +89,7 @@ class FormFieldTests: TestCase {
 
 
     func testThatNonOptionalFormFieldWithoutLabelOrValueProducesGenericError() {
-        let validator = TestValidator<String>()
-        let formField = FormField(key: "", validator: validator)
+        let formField = FormField(key: "", validator: testValidator)
         let fieldSetEntry = formField.makeFieldSetEntry()
         XCTAssertEqual(
             fieldSetEntry.errors,
@@ -94,11 +98,10 @@ class FormFieldTests: TestCase {
     }
 
     func testThatNonOptionalFormFieldWithLabelAndNoValueProducesErrorWithLabelInMessage() {
-        let validator = TestValidator<String>()
         let formField = FormField<TestValidator<String>>(
             key: "",
             label: "Name",
-            validator: validator
+            validator: testValidator
         )
         let fieldSetEntry = formField.makeFieldSetEntry()
         XCTAssertEqual(
