@@ -1,7 +1,11 @@
 import Node
 
+public protocol FieldSetRepresentable {
+    func makeFieldSet(in: Context?) throws -> Node
+}
+
 /// Types conforming to this protocol can be represented as a Field Set
-public protocol Form {
+public protocol Form: FieldSetRepresentable {
     var fields: [FieldSetEntryRepresentable] { get }
 }
 
