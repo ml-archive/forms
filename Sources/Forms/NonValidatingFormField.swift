@@ -16,9 +16,9 @@ public struct NonValidatingFormField<Value: NodeRepresentable> {
     }
 }
 
-// MARK: FieldSetEntryRepresentable
+// MARK: FieldsetEntryRepresentable
 
-extension NonValidatingFormField: FieldSetEntryRepresentable {
+extension NonValidatingFormField: FieldsetEntryRepresentable {
     public var node: NodeRepresentable? {
         return value
     }

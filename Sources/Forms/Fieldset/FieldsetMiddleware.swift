@@ -1,6 +1,6 @@
 import HTTP
 
-public class FieldSetMiddleware: Middleware {
+public class FieldsetMiddleware: Middleware {
     public init() {}
     
     public func respond(
@@ -9,14 +9,14 @@ public class FieldSetMiddleware: Middleware {
     ) throws -> Response {
         let session = request.session
         
-        // move field set from session to request
-        request.fieldSet = session?.fieldSet
-        session?.fieldSet = nil
+        // move fieldset from session to request
+        request.fieldset = session?.fieldset
+        session?.fieldset = nil
         
         let response = try next.respond(to: request)
         
-        // store any new field set in the session for the next request
-        session?.fieldSet = response.fieldSet
+        // store any new fieldset in the session for the next request
+        session?.fieldset = response.fieldset
         return response
     }
 }

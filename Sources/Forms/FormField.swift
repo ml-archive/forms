@@ -24,9 +24,9 @@ public struct FormField<V: Validator> where V.Input: NodeRepresentable {
     }
 }
 
-// MARK: FieldSetEntryRepresentable
+// MARK: FieldsetEntryRepresentable
 
-extension FormField: FieldSetEntryRepresentable {
+extension FormField: FieldsetEntryRepresentable {
     public var node: NodeRepresentable? {
         return value
     }

@@ -4,7 +4,7 @@ import Vapor
 
 extension ViewData {
     public init(
-        fieldSet: Node? = nil,
+        fieldset: Node? = nil,
         request: Request? = nil,
         other: ViewDataRepresentable? = nil
     ) throws {
@@ -12,20 +12,19 @@ extension ViewData {
         if let request = request {
             viewData["request"] = ViewData(try request.makeNode(in: nil))
         }
-        if let fieldSet = fieldSet {
-            // the key is not camelCased for backwards compatibility
-            viewData["fieldset"] = ViewData(fieldSet)
+        if let fieldset = fieldset {
+            viewData["fieldset"] = ViewData(fieldset)
         }
         self = viewData
     }
     
     public init(
-        fieldSet: Node? = nil,
+        fieldset: Node? = nil,
         request: Request? = nil,
         node: NodeRepresentable
     ) throws {
         try self.init(
-            fieldSet: fieldSet,
+            fieldset: fieldset,
             request: request,
             other: ViewData(node.makeNode(in: nil))
         )
