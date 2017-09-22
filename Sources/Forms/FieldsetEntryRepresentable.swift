@@ -10,12 +10,21 @@ public protocol FieldsetEntryRepresentable {
 extension FieldsetEntryRepresentable {
     
     /// Creates FieldsetEntry value from FormField with given key
-    public func makeFieldsetEntry() -> FieldsetEntry {
+    public func makeFieldsetEntry(
+        ignoreEmptyFields: Bool = false
+    ) -> FieldsetEntry {
+        let errors: [String]
+        if node == nil && ignoreEmptyFields {
+            errors = []
+        } else {
+            errors = errorReasons
+        }
+
         return FieldsetEntry(
             key: key,
             label: label,
             value: node,
-            errors: errorReasons
+            errors: errors
         )
     }
 }

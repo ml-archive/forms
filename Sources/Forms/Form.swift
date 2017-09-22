@@ -6,10 +6,14 @@ public protocol FieldsetRepresentable {
 
 /// Types conforming to this protocol can be represented as a Fieldset
 public protocol Form: FieldsetRepresentable {
+    var ignoreEmptyFields: Bool { get }
     var fields: [FieldsetEntryRepresentable] { get }
 }
 
 extension Form {
+    public var ignoreEmptyFields: Bool {
+        return false
+    }
 
     /// Creates a fieldset for use in an HTML form
     public func makeFieldset(in context: Context? = nil) throws -> Node {
@@ -19,6 +23,9 @@ extension Form {
     /// Returns false if any of the FieldsetEntries is invalid; valid otherwise
     public var isValid: Bool {
         for entry in fieldsetEntries {
+            if ignoreEmptyFields && entry.value == nil {
+                continue
+            }
             if !entry.isValid {
                 return false
             }
@@ -27,7 +34,8 @@ extension Form {
     }
     
     private var fieldsetEntries: [FieldsetEntry] {
-        return fields.map { $0.makeFieldsetEntry() }
+        return fields
+            .map { $0.makeFieldsetEntry(ignoreEmptyFields: ignoreEmptyFields) }
     }
 }
 
