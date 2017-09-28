@@ -2,25 +2,38 @@ import Node
 import Validation
 
 /// Represents a field for an HTML form
-public struct FormField<V: Validator> where V.Input: NodeRepresentable {
+public struct FormField<Input: Validatable> where Input: NodeRepresentable {
     public let key: String
     public let label: String?
-    public let value: V.Input?
-    public let validator: V
-    public let isOptional: Bool
+    public let value: Input?
+    public let validate: (Input?) throws -> Void
 
     public init(
         key: String,
         label: String? = nil,
-        value: V.Input? = nil,
-        validator: V,
-        isOptional: Bool = false
+        value: Input? = nil,
+        validate: @escaping (Input?) throws -> Void
     ) {
         self.key = key
         self.label = label
         self.value = value
-        self.validator = validator
-        self.isOptional = isOptional
+        self.validate = validate
+    }
+}
+
+extension FormField {
+    public init<V: Validator>(
+        key: String,
+        label: String? = nil,
+        value: Input? = nil,
+        validator: V
+    ) where V.Input == Optional<Input> {
+        self.init(
+            key: key,
+            label: label,
+            value: value,
+            validate: validator.validate
+        )
     }
 }
 
@@ -33,12 +46,7 @@ extension FormField: FieldsetEntryRepresentable {
     
     public var errorReasons: [String] {
         do {
-            if let value = value {
-                try validator.validate(value)
-            } else if value == nil, !isOptional {
-                let label = self.label ?? "Value"
-                return ["\(label) cannot be empty."]
-            }
+            try validate(value)
             return []
         } catch let error as FormFieldValidationError {
             return error.errorReasons

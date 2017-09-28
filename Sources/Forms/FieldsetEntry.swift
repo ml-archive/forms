@@ -1,6 +1,6 @@
 import Node
 
-/// Value representing an entry for a Fieldset
+/// Value representing an entry for a fieldset
 public struct FieldsetEntry {
     public let key: String
     public let label: String?
@@ -22,7 +22,7 @@ public struct FieldsetEntry {
 
 extension FieldsetEntry {
 
-    /// Returns false when the field
+    /// Returns false when the field has errors
     public var isValid: Bool {
         return errors.count == 0
     }
@@ -42,7 +42,11 @@ extension FieldsetEntry: NodeRepresentable {
             node["value"] = try value.makeNode(in: context)
         }
 
-        if !isValid {
+        if
+            !isValid,
+            let validationContext = context as? ValidationContext,
+            validationContext.shouldValidate
+        {
             node["errors"] = .array(errors.map { Node.string($0) })
         }
 
