@@ -4,20 +4,19 @@ import Validation
 import XCTest
 
 class FormFieldTests: TestCase {
-    let testValidator = TestValidator<String>()
+    let testValidator = TestValidator<String?>()
     
     func testThatAllValuesCanBeEmpty() {
         let formField = FormField(
             key: "",
-            validator: testValidator,
-            isOptional: true
+            validator: testValidator
         )
 
-        let fieldSetEntry = formField.makeFieldSetEntry()
+        let fieldsetEntry = formField.makeFieldsetEntry()
 
-        XCTAssertNil(fieldSetEntry.label)
-        XCTAssertNil(fieldSetEntry.value)
-        XCTAssertEqual(fieldSetEntry.errors.count, 0)
+        XCTAssertNil(fieldsetEntry.label)
+        XCTAssertNil(fieldsetEntry.value)
+        XCTAssertEqual(fieldsetEntry.errors.count, 0)
     }
 
     func testThatAllValuesCanBeSet() throws {
@@ -28,19 +27,19 @@ class FormFieldTests: TestCase {
             validator: testValidator
         )
 
-        let fieldSetEntry = formField.makeFieldSetEntry()
+        let fieldsetEntry = formField.makeFieldsetEntry()
         
-        XCTAssertEqual(fieldSetEntry.key, "key")
+        XCTAssertEqual(fieldsetEntry.key, "key")
         
-        let value = try fieldSetEntry.value?.makeNode(in: nil)
+        let value = try fieldsetEntry.value?.makeNode(in: nil)
 
-        XCTAssertEqual(fieldSetEntry.label, "Label")
+        XCTAssertEqual(fieldsetEntry.label, "Label")
         XCTAssertEqual(value, .string("value"))
-        XCTAssertEqual(fieldSetEntry.errors.count, 0)
+        XCTAssertEqual(fieldsetEntry.errors.count, 0)
     }
 
-    func testThatFieldSetFromFormFieldWithValueWithOneErrorSetsError() {
-        let validator = TestValidator<String>(errorReasons: ["Invalid"])
+    func testThatFieldsetFromFormFieldWithValueWithOneErrorSetsError() {
+        let validator = TestValidator<String?>(errorReasons: ["Invalid"])
 
         let formField = FormField(
             key: "",
@@ -48,13 +47,13 @@ class FormFieldTests: TestCase {
             validator: validator
         )
 
-        let fieldSetEntry = formField.makeFieldSetEntry()
+        let fieldsetEntry = formField.makeFieldsetEntry()
 
-        XCTAssertEqual(fieldSetEntry.errors, ["Invalid"])
+        XCTAssertEqual(fieldsetEntry.errors, ["Invalid"])
     }
 
-    func testThatFieldSetFromFormFieldWithValueWithTwoErrorsSetsErrors() {
-        let validator = TestValidator<String>(
+    func testThatFieldsetFromFormFieldWithValueWithTwoErrorsSetsErrors() {
+        let validator = TestValidator<String?>(
             errorReasons: ["Invalid", "Invalid again"]
         )
 
@@ -64,13 +63,13 @@ class FormFieldTests: TestCase {
             validator: validator
         )
 
-        let fieldSetEntry = formField.makeFieldSetEntry()
+        let fieldsetEntry = formField.makeFieldsetEntry()
 
-        XCTAssertEqual(fieldSetEntry.errors, ["Invalid", "Invalid again"])
+        XCTAssertEqual(fieldsetEntry.errors, ["Invalid", "Invalid again"])
     }
 
     func testThatNonValidatorErrorsAreDisplayedWithGenericErrorMessage() {
-        let validator = TestValidator<String>(
+        let validator = TestValidator<String?>(
             error: NSError(domain: "", code: 0)
         )
 
@@ -80,34 +79,11 @@ class FormFieldTests: TestCase {
             validator: validator
         )
 
-        let fieldSetEntry = formField.makeFieldSetEntry()
+        let fieldsetEntry = formField.makeFieldsetEntry()
 
         XCTAssertEqual(
-            fieldSetEntry.errors,
+            fieldsetEntry.errors,
             ["An unknown error occurred during validation."])
-    }
-
-
-    func testThatNonOptionalFormFieldWithoutLabelOrValueProducesGenericError() {
-        let formField = FormField(key: "", validator: testValidator)
-        let fieldSetEntry = formField.makeFieldSetEntry()
-        XCTAssertEqual(
-            fieldSetEntry.errors,
-            ["Value cannot be empty."]
-        )
-    }
-
-    func testThatNonOptionalFormFieldWithLabelAndNoValueProducesErrorWithLabelInMessage() {
-        let formField = FormField<TestValidator<String>>(
-            key: "",
-            label: "Name",
-            validator: testValidator
-        )
-        let fieldSetEntry = formField.makeFieldSetEntry()
-        XCTAssertEqual(
-            fieldSetEntry.errors,
-            ["Name cannot be empty."]
-        )
     }
 }
 
@@ -127,7 +103,7 @@ class TestValidator<T: Validatable>: Validator {
         self.errorReasons = []
     }
 
-    func validate(_ input: T) throws {
+    func validate(_: T) throws {
         if let error = error {
             throw error
         }

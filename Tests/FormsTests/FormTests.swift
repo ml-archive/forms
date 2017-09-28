@@ -4,12 +4,12 @@ import Validation
 import XCTest
 
 class FormTests: TestCase {
-    func testThatMakeFieldSetIncludesAllValues() throws {
+    func testThatMakeFieldsetIncludesAllValues() throws {
         let userForm = UserForm(name: "Andy Weir", birthyear: 1972)
-        let fieldSet = try userForm.makeFieldSet()
+        let fieldset = try userForm.makeFieldset()
         XCTAssertTrue(userForm.isValid)
         XCTAssertEqual(
-            fieldSet,
+            fieldset,
             ["name": [
                 "label": "Name",
                 "value": "Andy Weir"
@@ -22,21 +22,24 @@ class FormTests: TestCase {
         )
     }
 
-    func testThatMakeFieldSetIncludesAllValuesAndErrors() throws {
+    func testThatMakeFieldsetIncludesAllValuesAndErrors() throws {
         let userForm = UserForm(name: "A name that is too long", birthyear: 1879)
-        let fieldSet = try userForm.makeFieldSet()
+        let fieldset = try userForm
+            .makeFieldset(
+                in: ValidationContext(shouldValidate: true)
+        )
         XCTAssertFalse(userForm.isValid)
         XCTAssertEqual(
-            fieldSet,
+            fieldset,
             ["name": [
                 "label": "Name",
                 "value": "A name that is too long",
-                "errors": ["A name that is too long count 23 is not contained in 1...10"]
+                "errors": ["Too long"]
                 ],
              "birthyear": [
                 "label": "Year of birth",
                 "value": 1879,
-                "errors": ["1879 is not not contained in 1900...2017"]
+                "errors": ["Too old"]
                 ]
             ]
         )
@@ -46,27 +49,31 @@ class FormTests: TestCase {
 // Mark: Helper
 
 struct UserForm {
-    let name: FormField<Count<String>>
-    let birthyear: FormField<Compare<Int>>
+    let name: FormField<String>
+    let birthyear: FormField<Int>
 
     init(name: String? = nil, birthyear: Int? = nil) {
         self.name = FormField(
             key: "name",
             label: "Name",
-            value: name,
-            validator: .containedIn(low: 1, high: 10)
-        )
+            value: name) {
+                if let count = $0?.count, count > 10 {
+                    throw "Too long"
+                }
+        }
         self.birthyear = FormField(
             key: "birthyear",
             label: "Year of birth",
-            value: birthyear,
-            validator: .containedIn(low: 1900, high: 2017)
-        )
+            value: birthyear) {
+                if let year = $0, year < 1900 {
+                    throw "Too old"
+                }
+        }
     }
 }
 
 extension UserForm: Form {
-    var fields: [FieldSetEntryRepresentable] {
+    var fields: [FieldsetEntryRepresentable] {
         return [name, birthyear]
     }
 }
