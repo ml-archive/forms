@@ -6,7 +6,7 @@ import XCTest
 class FormTests: TestCase {
     func testThatMakeFieldsetIncludesAllValues() throws {
         let userForm = UserForm(name: "Andy Weir", birthyear: 1972)
-        let fieldset = try userForm.makeFieldset()
+        let fieldset = try userForm.makeFieldset(withValidation: false)
         XCTAssertTrue(userForm.isValid)
         XCTAssertEqual(
             fieldset,
@@ -24,10 +24,8 @@ class FormTests: TestCase {
 
     func testThatMakeFieldsetIncludesAllValuesAndErrors() throws {
         let userForm = UserForm(name: "A name that is too long", birthyear: 1879)
-        let fieldset = try userForm
-            .makeFieldset(
-                in: ValidationContext(shouldValidate: true)
-        )
+        let fieldset = try userForm.makeFieldset(withValidation: true)
+
         XCTAssertFalse(userForm.isValid)
         XCTAssertEqual(
             fieldset,

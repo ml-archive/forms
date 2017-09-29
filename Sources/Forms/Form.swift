@@ -7,7 +7,7 @@ public protocol Form: FieldsetRepresentable {
 
 extension Form {
     /// Creates a fieldset for use in an HTML form
-    public func makeFieldset(in context: Context? = nil) throws -> Node {
+    public func makeNode(in context: Context? = nil) throws -> Node {
         return try fieldsetEntries.makeFieldset(in: context)
     }
 
