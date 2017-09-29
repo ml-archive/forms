@@ -21,10 +21,12 @@ public struct FieldsetEntry {
 }
 
 extension FieldsetEntry {
+    public func isValid(inValidationMode mode: ValidationMode) -> Bool {
+        guard errors.count > 0, mode != .none else {
+            return true
+        }
 
-    /// Returns false when the field has errors
-    public var isValid: Bool {
-        return errors.count == 0
+        return value == nil && mode == .nonNil
     }
 }
 
@@ -43,9 +45,8 @@ extension FieldsetEntry: NodeRepresentable {
         }
 
         if
-            !isValid,
             let validationContext = context as? ValidationContext,
-            validationContext.shouldValidate
+            !isValid(inValidationMode: validationContext.mode)
         {
             node["errors"] = .array(errors.map { Node.string($0) })
         }

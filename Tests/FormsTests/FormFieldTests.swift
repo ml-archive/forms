@@ -87,6 +87,56 @@ class FormFieldTests: TestCase {
     }
 }
 
+// MARK: Validation Modes
+
+enum TestError: FormFieldValidationError {
+    case failed
+
+    var errorReasons: [String] {
+        return ["failed"]
+    }
+}
+
+struct ValidationModeForm: Form {
+    let fieldWithInvalidValue = FormField<String>(key: "a", value: "invalid") { _ in
+        throw TestError.failed
+    }
+    let fieldWithNilValue = FormField<String>(key: "b") { _ in
+        throw TestError.failed
+    }
+    let fieldWithValidValue = FormField<String>(key: "c")
+
+    var fields: [FieldsetEntryRepresentable] {
+        return [fieldWithInvalidValue, fieldWithNilValue, fieldWithValidValue]
+    }
+}
+
+extension FormFieldTests {
+    func testValidationModes() throws {
+        let form = ValidationModeForm()
+
+        XCTAssertTrue(form.isValid(inValidationMode: .none))
+        XCTAssertFalse(form.isValid(inValidationMode: .nonNil))
+        XCTAssertFalse(form.isValid(inValidationMode: .all))
+
+        let fieldset1 = try form.makeFieldset(inValidationMode: .none)
+        let fieldset2 = try form.makeFieldset(inValidationMode: .nonNil)
+        let fieldset3 = try form.makeFieldset(inValidationMode: .all)
+
+        XCTAssertNil(fieldset1["a"]?["errors"]?.array)
+        XCTAssertNil(fieldset1["b"]?["errors"]?.array)
+        XCTAssertNil(fieldset1["c"]?["errors"]?.array)
+
+        XCTAssertEqual(fieldset2["a"]?["errors"]?.array?.first, "failed")
+        XCTAssertNil(fieldset2["b"]?["errors"]?.array)
+        XCTAssertNil(fieldset2["c"]?["errors"]?.array)
+
+        XCTAssertEqual(fieldset3["a"]?["errors"]?.array?.first, "failed")
+        XCTAssertEqual(fieldset3["b"]?["errors"]?.array?.first, "failed")
+        XCTAssertNil(fieldset3["c"]?["errors"]?.array)
+    }
+}
+
 // MARK: Helper
 
 class TestValidator<T: Validatable>: Validator {

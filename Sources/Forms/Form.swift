@@ -12,9 +12,9 @@ extension Form {
     }
 
     /// Returns false if any of the FieldsetEntries is invalid; true otherwise
-    public var isValid: Bool {
+    public func isValid(inValidationMode mode: ValidationMode) -> Bool {
         for entry in fieldsetEntries {
-            if !entry.isValid {
+            if !entry.isValid(inValidationMode: mode) {
                 return false
             }
         }

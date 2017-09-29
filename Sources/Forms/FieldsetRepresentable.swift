@@ -4,9 +4,8 @@ public protocol FieldsetRepresentable: NodeRepresentable {}
 
 extension FieldsetRepresentable {
     public func makeFieldset(
-        withValidation shouldValidate: Bool = true
+        inValidationMode mode: ValidationMode
     ) throws -> Node {
-        let context = ValidationContext(shouldValidate: shouldValidate)
-        return try makeNode(in: context)
+        return try makeNode(in: ValidationContext(mode: mode))
     }
 }

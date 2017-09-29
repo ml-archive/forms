@@ -1,9 +1,9 @@
 import Node
 
 public struct ValidationContext: Context {
-    public let shouldValidate: Bool
+    public let mode: ValidationMode
 
-    public init(shouldValidate: Bool) {
-        self.shouldValidate = shouldValidate
+    public init(mode: ValidationMode) {
+        self.mode = mode
     }
 }

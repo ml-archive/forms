@@ -21,7 +21,7 @@ class FieldsetEntryTests: TestCase {
         )
 
         try XCTAssertEqual(
-            fieldsetEntry.makeNode(in: ValidationContext(shouldValidate: true)),
+            fieldsetEntry.makeNode(in: ValidationContext(mode: .all)),
             ["label": "label",
              "value": "value",
              "errors": ["error 1", "error 2"]]
@@ -30,11 +30,11 @@ class FieldsetEntryTests: TestCase {
 
     func testThatFieldsetEntryWithoutErrorsIsValid() {
         let fieldsetEntry = FieldsetEntry(key: "")
-        XCTAssertTrue(fieldsetEntry.isValid)
+        XCTAssertTrue(fieldsetEntry.isValid(inValidationMode: .all))
     }
 
     func testThatFieldsetEntryWithErrorsIsInvalid() {
         let fieldsetEntry = FieldsetEntry(key: "", errors: [""])
-        XCTAssertFalse(fieldsetEntry.isValid)
+        XCTAssertFalse(fieldsetEntry.isValid(inValidationMode: .all))
     }
 }

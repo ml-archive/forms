@@ -12,7 +12,7 @@ public struct FormField<Input: Validatable> where Input: NodeRepresentable {
         key: String,
         label: String? = nil,
         value: Input? = nil,
-        validate: @escaping (Input?) throws -> Void
+        validate: @escaping (Input?) throws -> Void = { _ in }
     ) {
         self.key = key
         self.label = label
