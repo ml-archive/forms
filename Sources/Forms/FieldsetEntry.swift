@@ -20,7 +20,9 @@ public struct FieldsetEntry {
     }
 }
 
-extension FieldsetEntry {
+// MARK: ValidationModeValidatable
+
+extension FieldsetEntry: ValidationModeValidatable {
     public func isValid(inValidationMode mode: ValidationMode) -> Bool {
         guard errors.count > 0, mode != .none else {
             return true
