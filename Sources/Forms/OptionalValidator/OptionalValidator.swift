@@ -4,8 +4,8 @@ import Validation
 /// of non-nil input.
 public struct OptionalValidator<Input> {
     public let isOptional: Bool
-    public let validate: (Input) throws -> Void
     public let errorOnNil: FormFieldValidationError
+    public let validate: (Input) throws -> Void
 
     public init(
         isOptional: Bool = false,

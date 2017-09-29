@@ -71,7 +71,7 @@ struct UserForm {
 }
 
 extension UserForm: Form {
-    var fields: [FieldsetEntryRepresentable] {
+    var fields: [FieldsetEntryRepresentable & ValidationModeValidatable] {
         return [name, birthyear]
     }
 }

@@ -106,7 +106,7 @@ struct ValidationModeForm: Form {
     }
     let fieldWithValidValue = FormField<String>(key: "c")
 
-    var fields: [FieldsetEntryRepresentable] {
+    var fields: [FieldsetEntryRepresentable & ValidationModeValidatable] {
         return [fieldWithInvalidValue, fieldWithNilValue, fieldWithValidValue]
     }
 }

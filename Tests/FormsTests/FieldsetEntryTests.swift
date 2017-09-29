@@ -27,14 +27,4 @@ class FieldsetEntryTests: TestCase {
              "errors": ["error 1", "error 2"]]
         )
     }
-
-    func testThatFieldsetEntryWithoutErrorsIsValid() {
-        let fieldsetEntry = FieldsetEntry(key: "")
-        XCTAssertTrue(fieldsetEntry.isValid(inValidationMode: .all))
-    }
-
-    func testThatFieldsetEntryWithErrorsIsInvalid() {
-        let fieldsetEntry = FieldsetEntry(key: "", errors: [""])
-        XCTAssertFalse(fieldsetEntry.isValid(inValidationMode: .all))
-    }
 }

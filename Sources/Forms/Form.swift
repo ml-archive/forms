@@ -2,7 +2,7 @@ import Node
 
 /// Types conforming to this protocol can be represented as a fieldset
 public protocol Form: FieldsetRepresentable, ValidationModeValidatable {
-    var fields: [FieldsetEntryRepresentable] { get }
+    var fields: [FieldsetEntryRepresentable & ValidationModeValidatable] { get }
 }
 
 // MARK: NodeRepresentable
@@ -11,7 +11,9 @@ extension Form {
 
     /// Creates a fieldset for use in an HTML form
     public func makeNode(in context: Context? = nil) throws -> Node {
-        return try fieldsetEntries.makeFieldset(in: context)
+        return try fields
+            .map { $0.makeFieldsetEntry() }
+            .makeFieldset(in: context)
     }
 }
 
@@ -21,20 +23,23 @@ extension Form {
 
     /// Returns false if any of the FieldsetEntries is invalid; true otherwise
     public func isValid(inValidationMode mode: ValidationMode) -> Bool {
-        for entry in fieldsetEntries {
-            if !entry.isValid(inValidationMode: mode) {
+        guard mode != .none else { return true }
+
+        for field in fields {
+            if !field.isValid(inValidationMode: mode) {
                 return false
             }
         }
+
         return true
     }
-}
 
-// MARK: Helper
+    /// Validates each field according to the validation mode.
+    /// Throws on first invalid field.
+    public func validate(inValidationMode mode: ValidationMode) throws {
+        guard mode != .none else { return }
 
-extension Form {
-    fileprivate var fieldsetEntries: [FieldsetEntry] {
-        return fields.map { $0.makeFieldsetEntry() }
+        try fields.forEach { try $0.validate(inValidationMode: mode) }
     }
 }
 

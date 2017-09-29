@@ -20,18 +20,6 @@ public struct FieldsetEntry {
     }
 }
 
-// MARK: ValidationModeValidatable
-
-extension FieldsetEntry: ValidationModeValidatable {
-    public func isValid(inValidationMode mode: ValidationMode) -> Bool {
-        guard errors.count > 0, mode != .none else {
-            return true
-        }
-
-        return value == nil && mode == .nonNil
-    }
-}
-
 // MARK: NodeRepresentable
 
 extension FieldsetEntry: NodeRepresentable {
@@ -46,13 +34,23 @@ extension FieldsetEntry: NodeRepresentable {
             node["value"] = try value.makeNode(in: context)
         }
 
-        if
-            let validationContext = context as? ValidationContext,
-            !isValid(inValidationMode: validationContext.mode)
-        {
+        if shouldIncludeErrors(in: context) {
             node["errors"] = .array(errors.map { Node.string($0) })
         }
 
         return node
+    }
+
+    private func shouldIncludeErrors(in context: Context?) -> Bool {
+        guard
+            errors.count > 0,
+            let mode = (context as? ValidationContext)?.mode,
+            mode != .none,
+            value != nil || mode == .all
+        else {
+            return false
+        }
+
+        return true
     }
 }

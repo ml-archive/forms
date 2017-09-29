@@ -55,3 +55,26 @@ extension FormField: FieldsetEntryRepresentable {
         }
     }
 }
+
+// MARK: ValidationModeValidatable
+
+extension FormField: ValidationModeValidatable {
+    public func isValid(inValidationMode mode: ValidationMode) -> Bool {
+        do {
+            try validate(inValidationMode: mode)
+            return true
+        } catch {
+            return false
+        }
+    }
+
+    public func validate(inValidationMode mode: ValidationMode) throws {
+        switch mode {
+        case .all,
+             .nonNil where value != nil:
+            try validate(value)
+        default:
+            return
+        }
+    }
+}
