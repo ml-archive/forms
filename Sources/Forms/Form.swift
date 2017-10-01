@@ -1,8 +1,11 @@
 import Node
 
+public typealias FieldType = FieldsetEntryRepresentable &
+    ValidationModeValidatable
+
 /// Types conforming to this protocol can be represented as a fieldset
 public protocol Form: FieldsetRepresentable, ValidationModeValidatable {
-    var fields: [FieldsetEntryRepresentable & ValidationModeValidatable] { get }
+    var fields: [FieldType] { get }
 }
 
 // MARK: NodeRepresentable
