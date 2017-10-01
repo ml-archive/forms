@@ -24,19 +24,6 @@ extension Form {
 
 extension Form {
 
-    /// Returns false if any of the FieldsetEntries is invalid; true otherwise
-    public func isValid(inValidationMode mode: ValidationMode) -> Bool {
-        guard mode != .none else { return true }
-
-        for field in fields {
-            if !field.isValid(inValidationMode: mode) {
-                return false
-            }
-        }
-
-        return true
-    }
-
     /// Validates each field according to the validation mode.
     /// Throws on first invalid field.
     public func validate(inValidationMode mode: ValidationMode) throws {
