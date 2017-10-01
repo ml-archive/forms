@@ -12,7 +12,7 @@ extension Form {
     /// Creates a fieldset for use in an HTML form
     public func makeNode(in context: Context? = nil) throws -> Node {
         return try fields
-            .map { $0.makeFieldsetEntry() }
+            .flatMap { $0.makeFieldsetEntry() }
             .makeFieldset(in: context)
     }
 }

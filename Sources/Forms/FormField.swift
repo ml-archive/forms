@@ -3,13 +3,13 @@ import Validation
 
 /// Represents a field for an HTML form
 public struct FormField<Input: Validatable> where Input: NodeRepresentable {
-    public let key: String
+    public let key: String?
     public let label: String?
     public let value: Input?
     public let validate: (Input?) throws -> Void
 
     public init(
-        key: String,
+        key: String? = nil,
         label: String? = nil,
         value: Input? = nil,
         validate: @escaping (Input?) throws -> Void = { _ in }
@@ -23,7 +23,7 @@ public struct FormField<Input: Validatable> where Input: NodeRepresentable {
 
 extension FormField {
     public init<V: Validator>(
-        key: String,
+        key: String? = nil,
         label: String? = nil,
         value: Input? = nil,
         validator: V

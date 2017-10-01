@@ -12,7 +12,10 @@ class FormFieldTests: TestCase {
             validator: testValidator
         )
 
-        let fieldsetEntry = formField.makeFieldsetEntry()
+        guard let fieldsetEntry = formField.makeFieldsetEntry() else {
+            XCTFail()
+            return
+        }
 
         XCTAssertNil(fieldsetEntry.label)
         XCTAssertNil(fieldsetEntry.value)
@@ -27,8 +30,11 @@ class FormFieldTests: TestCase {
             validator: testValidator
         )
 
-        let fieldsetEntry = formField.makeFieldsetEntry()
-        
+        guard let fieldsetEntry = formField.makeFieldsetEntry() else {
+            XCTFail()
+            return
+        }
+
         XCTAssertEqual(fieldsetEntry.key, "key")
         
         let value = try fieldsetEntry.value?.makeNode(in: nil)
@@ -47,7 +53,10 @@ class FormFieldTests: TestCase {
             validator: validator
         )
 
-        let fieldsetEntry = formField.makeFieldsetEntry()
+        guard let fieldsetEntry = formField.makeFieldsetEntry() else {
+            XCTFail()
+            return
+        }
 
         XCTAssertEqual(fieldsetEntry.errors, ["Invalid"])
     }
@@ -63,7 +72,10 @@ class FormFieldTests: TestCase {
             validator: validator
         )
 
-        let fieldsetEntry = formField.makeFieldsetEntry()
+        guard let fieldsetEntry = formField.makeFieldsetEntry() else {
+            XCTFail()
+            return
+        }
 
         XCTAssertEqual(fieldsetEntry.errors, ["Invalid", "Invalid again"])
     }
@@ -79,7 +91,10 @@ class FormFieldTests: TestCase {
             validator: validator
         )
 
-        let fieldsetEntry = formField.makeFieldsetEntry()
+        guard let fieldsetEntry = formField.makeFieldsetEntry() else {
+            XCTFail()
+            return
+        }
 
         XCTAssertEqual(
             fieldsetEntry.errors,
