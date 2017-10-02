@@ -1,11 +1,11 @@
-enum OptionalValidatorError {
+public enum OptionalValidatorError {
     case nilValue
 }
 
 // MARK: FormFieldValidationError
 
 extension OptionalValidatorError: FormFieldValidationError {
-    var errorReasons: [String] {
-        return ["Value should not be empty."]
+    public var errorReasons: [String] {
+        return ["Value must not be empty."]
     }
 }
