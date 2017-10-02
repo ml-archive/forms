@@ -1,7 +1,7 @@
 import Node
 
-/// Value representing an entry for a Field Set
-public struct FieldSetEntry {
+/// Value representing an entry for a fieldset
+public struct FieldsetEntry {
     public let key: String
     public let label: String?
     public let value: NodeRepresentable?
@@ -20,17 +20,9 @@ public struct FieldSetEntry {
     }
 }
 
-extension FieldSetEntry {
-
-    /// Returns false when the field
-    public var isValid: Bool {
-        return errors.count == 0
-    }
-}
-
 // MARK: NodeRepresentable
 
-extension FieldSetEntry: NodeRepresentable {
+extension FieldsetEntry: NodeRepresentable {
     public func makeNode(in context: Context?) throws -> Node {
         var node = Node([:])
 
@@ -42,10 +34,23 @@ extension FieldSetEntry: NodeRepresentable {
             node["value"] = try value.makeNode(in: context)
         }
 
-        if !isValid {
+        if shouldIncludeErrors(in: context) {
             node["errors"] = .array(errors.map { Node.string($0) })
         }
 
         return node
+    }
+
+    private func shouldIncludeErrors(in context: Context?) -> Bool {
+        guard
+            errors.count > 0,
+            let mode = (context as? ValidationContext)?.mode,
+            mode != .none,
+            value != nil || mode == .all
+        else {
+            return false
+        }
+
+        return true
     }
 }

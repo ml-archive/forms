@@ -1,6 +1,6 @@
 import Validation
 
-/// Error types conforming to the protocol show up in FieldSetEntries when
+/// Error types conforming to the protocol show up in FieldsetEntries when
 /// thrown during validation.
 public protocol FormFieldValidationError: Error {
     var errorReasons: [String] { get }

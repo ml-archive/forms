@@ -4,20 +4,22 @@ import Validation
 import XCTest
 
 class FormFieldTests: TestCase {
-    let testValidator = TestValidator<String>()
+    let testValidator = TestValidator<String?>()
     
     func testThatAllValuesCanBeEmpty() {
         let formField = FormField(
             key: "",
-            validator: testValidator,
-            isOptional: true
+            validator: testValidator
         )
 
-        let fieldSetEntry = formField.makeFieldSetEntry()
+        guard let fieldsetEntry = formField.makeFieldsetEntry() else {
+            XCTFail()
+            return
+        }
 
-        XCTAssertNil(fieldSetEntry.label)
-        XCTAssertNil(fieldSetEntry.value)
-        XCTAssertEqual(fieldSetEntry.errors.count, 0)
+        XCTAssertNil(fieldsetEntry.label)
+        XCTAssertNil(fieldsetEntry.value)
+        XCTAssertEqual(fieldsetEntry.errors.count, 0)
     }
 
     func testThatAllValuesCanBeSet() throws {
@@ -28,19 +30,22 @@ class FormFieldTests: TestCase {
             validator: testValidator
         )
 
-        let fieldSetEntry = formField.makeFieldSetEntry()
-        
-        XCTAssertEqual(fieldSetEntry.key, "key")
-        
-        let value = try fieldSetEntry.value?.makeNode(in: nil)
+        guard let fieldsetEntry = formField.makeFieldsetEntry() else {
+            XCTFail()
+            return
+        }
 
-        XCTAssertEqual(fieldSetEntry.label, "Label")
+        XCTAssertEqual(fieldsetEntry.key, "key")
+        
+        let value = try fieldsetEntry.value?.makeNode(in: nil)
+
+        XCTAssertEqual(fieldsetEntry.label, "Label")
         XCTAssertEqual(value, .string("value"))
-        XCTAssertEqual(fieldSetEntry.errors.count, 0)
+        XCTAssertEqual(fieldsetEntry.errors.count, 0)
     }
 
-    func testThatFieldSetFromFormFieldWithValueWithOneErrorSetsError() {
-        let validator = TestValidator<String>(errorReasons: ["Invalid"])
+    func testThatFieldsetFromFormFieldWithValueWithOneErrorSetsError() {
+        let validator = TestValidator<String?>(errorReasons: ["Invalid"])
 
         let formField = FormField(
             key: "",
@@ -48,13 +53,16 @@ class FormFieldTests: TestCase {
             validator: validator
         )
 
-        let fieldSetEntry = formField.makeFieldSetEntry()
+        guard let fieldsetEntry = formField.makeFieldsetEntry() else {
+            XCTFail()
+            return
+        }
 
-        XCTAssertEqual(fieldSetEntry.errors, ["Invalid"])
+        XCTAssertEqual(fieldsetEntry.errors, ["Invalid"])
     }
 
-    func testThatFieldSetFromFormFieldWithValueWithTwoErrorsSetsErrors() {
-        let validator = TestValidator<String>(
+    func testThatFieldsetFromFormFieldWithValueWithTwoErrorsSetsErrors() {
+        let validator = TestValidator<String?>(
             errorReasons: ["Invalid", "Invalid again"]
         )
 
@@ -64,13 +72,16 @@ class FormFieldTests: TestCase {
             validator: validator
         )
 
-        let fieldSetEntry = formField.makeFieldSetEntry()
+        guard let fieldsetEntry = formField.makeFieldsetEntry() else {
+            XCTFail()
+            return
+        }
 
-        XCTAssertEqual(fieldSetEntry.errors, ["Invalid", "Invalid again"])
+        XCTAssertEqual(fieldsetEntry.errors, ["Invalid", "Invalid again"])
     }
 
     func testThatNonValidatorErrorsAreDisplayedWithGenericErrorMessage() {
-        let validator = TestValidator<String>(
+        let validator = TestValidator<String?>(
             error: NSError(domain: "", code: 0)
         )
 
@@ -80,34 +91,64 @@ class FormFieldTests: TestCase {
             validator: validator
         )
 
-        let fieldSetEntry = formField.makeFieldSetEntry()
+        guard let fieldsetEntry = formField.makeFieldsetEntry() else {
+            XCTFail()
+            return
+        }
 
         XCTAssertEqual(
-            fieldSetEntry.errors,
+            fieldsetEntry.errors,
             ["An unknown error occurred during validation."])
     }
+}
 
+// MARK: Validation Modes
 
-    func testThatNonOptionalFormFieldWithoutLabelOrValueProducesGenericError() {
-        let formField = FormField(key: "", validator: testValidator)
-        let fieldSetEntry = formField.makeFieldSetEntry()
-        XCTAssertEqual(
-            fieldSetEntry.errors,
-            ["Value cannot be empty."]
-        )
+enum TestError: FormFieldValidationError {
+    case failed
+
+    var errorReasons: [String] {
+        return ["failed"]
     }
+}
 
-    func testThatNonOptionalFormFieldWithLabelAndNoValueProducesErrorWithLabelInMessage() {
-        let formField = FormField<TestValidator<String>>(
-            key: "",
-            label: "Name",
-            validator: testValidator
-        )
-        let fieldSetEntry = formField.makeFieldSetEntry()
-        XCTAssertEqual(
-            fieldSetEntry.errors,
-            ["Name cannot be empty."]
-        )
+struct ValidationModeForm: Form {
+    let fieldWithInvalidValue = FormField<String>(key: "a", value: "invalid") { _ in
+        throw TestError.failed
+    }
+    let fieldWithNilValue = FormField<String>(key: "b") { _ in
+        throw TestError.failed
+    }
+    let fieldWithValidValue = FormField<String>(key: "c")
+
+    var fields: [FieldType] {
+        return [fieldWithInvalidValue, fieldWithNilValue, fieldWithValidValue]
+    }
+}
+
+extension FormFieldTests {
+    func testValidationModes() throws {
+        let form = ValidationModeForm()
+
+        XCTAssertTrue(form.isValid(inValidationMode: .none))
+        XCTAssertFalse(form.isValid(inValidationMode: .nonNil))
+        XCTAssertFalse(form.isValid(inValidationMode: .all))
+
+        let fieldset1 = try form.makeFieldset(inValidationMode: .none)
+        let fieldset2 = try form.makeFieldset(inValidationMode: .nonNil)
+        let fieldset3 = try form.makeFieldset(inValidationMode: .all)
+
+        XCTAssertNil(fieldset1["a"]?["errors"]?.array)
+        XCTAssertNil(fieldset1["b"]?["errors"]?.array)
+        XCTAssertNil(fieldset1["c"]?["errors"]?.array)
+
+        XCTAssertEqual(fieldset2["a"]?["errors"]?.array?.first, "failed")
+        XCTAssertNil(fieldset2["b"]?["errors"]?.array)
+        XCTAssertNil(fieldset2["c"]?["errors"]?.array)
+
+        XCTAssertEqual(fieldset3["a"]?["errors"]?.array?.first, "failed")
+        XCTAssertEqual(fieldset3["b"]?["errors"]?.array?.first, "failed")
+        XCTAssertNil(fieldset3["c"]?["errors"]?.array)
     }
 }
 
@@ -127,7 +168,7 @@ class TestValidator<T: Validatable>: Validator {
         self.errorReasons = []
     }
 
-    func validate(_ input: T) throws {
+    func validate(_: T) throws {
         if let error = error {
             throw error
         }
