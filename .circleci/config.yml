@@ -11,7 +11,6 @@ jobs:
           name: Install Vapor toolbox
           command: |
             sudo apt-get install --yes vapor
-            sudo apt-get install --yes cmysql
             sudo chmod -R a+rx /usr/
       - run:
           command: |
