@@ -13,5 +13,6 @@ jobs:
             sudo apt-get install --yes vapor
             sudo chmod -R a+rx /usr/
       - run:
+          name: Run Tests
           command: |
             swift test -Xswiftc -DNOJSON
