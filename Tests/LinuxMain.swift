@@ -5,13 +5,11 @@
 @testable import FormsTests
 import XCTest
 
-extension FieldSetEntryTests {
+extension FieldsetEntryTests {
   static var allTests = [
     ("testThatKeyGetsSet", testThatKeyGetsSet),
-    ("testThatEmptyFieldSetResultsInEmptyNode", testThatEmptyFieldSetResultsInEmptyNode),
+    ("testThatEmptyFieldsetResultsInEmptyNode", testThatEmptyFieldsetResultsInEmptyNode),
     ("testThatNodeContainsAllValues", testThatNodeContainsAllValues),
-    ("testThatFieldSetEntryWithoutErrorsIsValid", testThatFieldSetEntryWithoutErrorsIsValid),
-    ("testThatFieldSetEntryWithErrorsIsInvalid", testThatFieldSetEntryWithErrorsIsInvalid),
   ]
 }
 
@@ -19,12 +17,10 @@ extension FormFieldTests {
   static var allTests = [
     ("testThatAllValuesCanBeEmpty", testThatAllValuesCanBeEmpty),
     ("testThatAllValuesCanBeSet", testThatAllValuesCanBeSet),
-    ("testThatFieldSetFromFormFieldWithValueWithOneErrorSetsError", testThatFieldSetFromFormFieldWithValueWithOneErrorSetsError),
-    ("testThatFieldSetFromFormFieldWithValueWithTwoErrorsSetsErrors", testThatFieldSetFromFormFieldWithValueWithTwoErrorsSetsErrors),
+    ("testThatFieldsetFromFormFieldWithValueWithOneErrorSetsError", testThatFieldsetFromFormFieldWithValueWithOneErrorSetsError),
+    ("testThatFieldsetFromFormFieldWithValueWithTwoErrorsSetsErrors", testThatFieldsetFromFormFieldWithValueWithTwoErrorsSetsErrors),
     ("testThatNonValidatorErrorsAreDisplayedWithGenericErrorMessage", testThatNonValidatorErrorsAreDisplayedWithGenericErrorMessage),
-    ("testThatNonOptionalFormFieldWithoutLabelOrValueProducesGenericError", testThatNonOptionalFormFieldWithoutLabelOrValueProducesGenericError),
-    ("testThatNonOptionalFormFieldWithLabelAndNoValueProducesErrorWithLabelInMessage", testThatNonOptionalFormFieldWithLabelAndNoValueProducesErrorWithLabelInMessage),
-    ("testThatOutputValueGetsTransformed", testThatOutputValueGetsTransformed),
+    ("testValidationModes", testValidationModes),
   ]
 }
 
@@ -37,13 +33,13 @@ extension FormFieldValidationErrorTests {
 
 extension FormTests {
   static var allTests = [
-    ("testThatMakeFieldSetIncludesAllValues", testThatMakeFieldSetIncludesAllValues),
-    ("testThatMakeFieldSetIncludesAllValuesAndErrors", testThatMakeFieldSetIncludesAllValuesAndErrors),
+    ("testThatMakeFieldsetIncludesAllValues", testThatMakeFieldsetIncludesAllValues),
+    ("testThatMakeFieldsetIncludesAllValuesAndErrors", testThatMakeFieldsetIncludesAllValuesAndErrors),
   ]
 }
 
 XCTMain([
-  testCase(FieldSetEntryTests.allTests),
+  testCase(FieldsetEntryTests.allTests),
   testCase(FormFieldTests.allTests),
   testCase(FormFieldValidationErrorTests.allTests),
   testCase(FormTests.allTests),
