@@ -13,7 +13,7 @@ Tools for working with Forms in Vapor.
 
 Update your `Package.swift` file.
 ```swift
-.Package(url: "https://github.com/siemensikkema/forms.git", majorVersion: 0)
+.Package(url: "https://github.com/nodes-vapor/forms.git", majorVersion: 0, minor: 4)
 ```
 
 ## Getting started 🚀
