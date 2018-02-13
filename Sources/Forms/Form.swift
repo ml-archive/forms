@@ -22,14 +22,20 @@ extension Form {
 
 // MARK: ValidationModeValidatable
 
-extension Form {
-
+extension Array where Element == ValidationModeValidatable {
+    
     /// Validates each field according to the validation mode.
     /// Throws on first invalid field.
     public func validate(inValidationMode mode: ValidationMode) throws {
         guard mode != .none else { return }
 
-        try fields.forEach { try $0.validate(inValidationMode: mode) }
+        try forEach { try $0.validate(inValidationMode: mode) }
+    }
+}
+
+extension Form {
+    public func validate(inValidationMode mode: ValidationMode) throws {
+        try fields.map { $0 as ValidationModeValidatable }.validate(inValidationMode: mode)
     }
 }
 
