@@ -23,7 +23,7 @@ extension Form {
 // MARK: ValidationModeValidatable
 
 extension Array where Element == ValidationModeValidatable {
-    
+
     /// Validates each field according to the validation mode.
     /// Throws on first invalid field.
     public func validate(inValidationMode mode: ValidationMode) throws {

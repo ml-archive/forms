@@ -43,7 +43,7 @@ extension FormField: FieldsetEntryRepresentable {
     public var node: NodeRepresentable? {
         return value
     }
-    
+
     public var errorReasons: [String] {
         do {
             try validate(value)

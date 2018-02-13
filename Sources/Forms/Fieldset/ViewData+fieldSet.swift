@@ -17,7 +17,7 @@ extension ViewData {
         }
         self = viewData
     }
-    
+
     public init(
         fieldset: Node? = nil,
         request: Request? = nil,
