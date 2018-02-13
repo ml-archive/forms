@@ -8,13 +8,13 @@ public protocol FieldsetEntryRepresentable {
 }
 
 extension FieldsetEntryRepresentable {
-    
+
     /// Creates FieldsetEntry value from FormField with given key
     public func makeFieldsetEntry() -> FieldsetEntry? {
         guard let key = key else {
             return nil
         }
-        
+
         return FieldsetEntry(
             key: key,
             label: label,
