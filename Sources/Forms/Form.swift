@@ -22,7 +22,7 @@ extension Form {
 
 // MARK: ValidationModeValidatable
 
-extension Array where Element == ValidationModeValidatable {
+extension Sequence where Iterator.Element == ValidationModeValidatable {
 
     /// Validates each field according to the validation mode.
     /// Throws on first invalid field.
