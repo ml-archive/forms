@@ -62,16 +62,6 @@ extension ViewDataKey: ExpressibleByStringLiteral {
 }
 
 extension ViewDataKey: Hashable {
-    public static func == (l: ViewDataKey, r: ViewDataKey) -> Bool {
-        switch (l, r) {
-        case (.other(let l), .other(let r)) where l == r: fallthrough
-        case (.request, .request), (.fieldset, .fieldset):
-            return true
-        default:
-            return false
-        }
-    }
-
     public var hashValue: Int {
         return String(describing: self).hashValue
     }
