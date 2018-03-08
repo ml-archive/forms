@@ -22,7 +22,7 @@ extension Form {
 
 // MARK: ValidationModeValidatable
 
-extension Array where Element == ValidationModeValidatable {
+extension Sequence where Element == ValidationModeValidatable {
 
     /// Validates each field according to the validation mode.
     /// Throws on first invalid field.
@@ -41,7 +41,7 @@ extension Form {
 
 // MARK: Sequence extension
 
-extension Sequence where Iterator.Element == FieldsetEntry {
+extension Sequence where Element == FieldsetEntry {
     fileprivate func makeFieldset(in context: Context?) throws -> Node {
         var node = Node([:])
         for entry in self {
