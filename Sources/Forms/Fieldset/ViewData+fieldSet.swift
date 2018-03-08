@@ -1,32 +1,68 @@
-import HTTP
-import Node
 import Vapor
 
 extension ViewData {
+
+    /// Provides a convenient way to initialize ViewData values.
+    ///
+    /// Example:
+    /// ```
+    /// let viewData = ViewData([
+    ///     .fieldset: fieldset,
+    ///     .request: request,
+    ///     "other": "value".
+    /// ])
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - dict: keys and values to add contruct the new value from.
+    ///   - context: context to use when creating nodes from the values in `dict`
+    /// - Throws: on errors during makeNode
     public init(
-        fieldset: Node? = nil,
-        request: Request? = nil,
-        other: ViewDataRepresentable? = nil
+        _ dict: [ViewDataKey: NodeRepresentable],
+        in context: Context = ViewContext.shared
     ) throws {
-        var viewData = try other?.makeViewData() ?? ViewData([:])
-        if let request = request {
-            viewData["request"] = ViewData(try request.makeNode(in: nil))
+        var stringDict: [String: NodeRepresentable] = [:]
+        dict.forEach { (key, value) in
+            stringDict[key.rawValue] = value
         }
-        if let fieldset = fieldset {
-            viewData["fieldset"] = ViewData(fieldset)
-        }
-        self = viewData
+        try self.init(stringDict.makeNode(in: context))
+    }
+}
+
+public enum ViewDataKey: RawRepresentable {
+    public init?(rawValue: String) {
+        self.init(string: rawValue)
     }
 
-    public init(
-        fieldset: Node? = nil,
-        request: Request? = nil,
-        node: NodeRepresentable
-    ) throws {
-        try self.init(
-            fieldset: fieldset,
-            request: request,
-            other: ViewData(node.makeNode(in: nil))
-        )
+    public init(string: String) {
+        switch string {
+        case "fieldset": self = .fieldset
+        case "request": self = .request
+        default: self = .other(string)
+        }
+    }
+
+    public var rawValue: String {
+        switch self {
+        case .fieldset: return "fieldset"
+        case .request: return "request"
+        case .other(let string): return string
+        }
+    }
+
+    case request
+    case fieldset
+    case other(String)
+}
+
+extension ViewDataKey: ExpressibleByStringLiteral {
+    public init(stringLiteral value: String) {
+        self.init(string: value)
+    }
+}
+
+extension ViewDataKey: Hashable {
+    public var hashValue: Int {
+        return String(describing: self).hashValue
     }
 }
