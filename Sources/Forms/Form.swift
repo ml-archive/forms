@@ -4,25 +4,57 @@ public typealias FieldType = FieldsetEntryRepresentable &
     ValidationModeValidatable
 
 /// Types conforming to this protocol can be represented as a fieldset
-public protocol Form: FieldsetRepresentable, ValidationModeValidatable {
+public protocol Form: ValidationModeValidatable {
     var fields: [FieldType] { get }
 }
 
-// MARK: NodeRepresentable
-
 extension Form {
-
-    /// Creates a fieldset for use in an HTML form
-    public func makeNode(in context: Context? = nil) throws -> Node {
+    public func makeFieldset(
+        inValidationMode mode: ValidationMode
+    ) throws -> Node {
         return try fields
             .flatMap { $0.makeFieldsetEntry() }
-            .makeFieldset(in: context)
+            .makeFieldset(inValidationMode: mode)
     }
 }
 
-// MARK: ValidationModeValidatable
+// MARK: Form + validate
 
-extension Sequence where Element == ValidationModeValidatable {
+extension Form {
+    public func validate(inValidationMode mode: ValidationMode) throws {
+        try fields.map(AnyValidatable.init).validate(inValidationMode: mode)
+    }
+}
+
+/// Helper for enabling batch validation of non-concrete `ValidationModeValidatable`s
+private struct AnyValidatable: ValidationModeValidatable {
+    let _validate: (ValidationMode) throws -> Void
+
+    init(_ v: ValidationModeValidatable) {
+        _validate = v.validate
+    }
+
+    func validate(inValidationMode mode: ValidationMode) throws {
+        try _validate(mode)
+    }
+}
+
+// MARK: Sequence + makeFieldset
+
+extension Sequence where Element == FieldsetEntry {
+    public func makeFieldset(inValidationMode mode: ValidationMode) throws -> Node {
+        var node = Node([:])
+        let context = ValidationContext(mode: mode)
+        for entry in self {
+            node[entry.key] = try entry.makeNode(in: context)
+        }
+        return node
+    }
+}
+
+// MARK: Sequence + validate
+
+extension Sequence where Element: ValidationModeValidatable {
 
     /// Validates each field according to the validation mode.
     /// Throws on first invalid field.
@@ -30,23 +62,5 @@ extension Sequence where Element == ValidationModeValidatable {
         guard mode != .none else { return }
 
         try forEach { try $0.validate(inValidationMode: mode) }
-    }
-}
-
-extension Form {
-    public func validate(inValidationMode mode: ValidationMode) throws {
-        try fields.map { $0 as ValidationModeValidatable }.validate(inValidationMode: mode)
-    }
-}
-
-// MARK: Sequence extension
-
-extension Sequence where Element == FieldsetEntry {
-    fileprivate func makeFieldset(in context: Context?) throws -> Node {
-        var node = Node([:])
-        for entry in self {
-            node[entry.key] = try entry.makeNode(in: context)
-        }
-        return node
     }
 }

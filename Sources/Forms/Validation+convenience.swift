@@ -8,8 +8,9 @@ extension Validator {
     }
 
     public func allowingNil(
-        _ isOptional: Bool = true
+        _ isOptional: Bool = true,
+        errorOnNil: FormFieldValidationError = OptionalValidatorError.nilValue
     ) -> OptionalValidator<Input> {
-        return OptionalValidator(isOptional: isOptional, validator: self)
+        return OptionalValidator(isOptional: isOptional, errorOnNil: errorOnNil, validator: self)
     }
 }
