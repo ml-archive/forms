@@ -18,16 +18,11 @@ extension Form {
     }
 }
 
-// MARK: ValidationModeValidatable
+// MARK: Form + validate
 
-extension Sequence where Element: ValidationModeValidatable {
-
-    /// Validates each field according to the validation mode.
-    /// Throws on first invalid field.
+extension Form {
     public func validate(inValidationMode mode: ValidationMode) throws {
-        guard mode != .none else { return }
-
-        try forEach { try $0.validate(inValidationMode: mode) }
+        try fields.map(AnyValidatable.init).validate(inValidationMode: mode)
     }
 }
 
@@ -44,13 +39,7 @@ private struct AnyValidatable: ValidationModeValidatable {
     }
 }
 
-extension Form {
-    public func validate(inValidationMode mode: ValidationMode) throws {
-        try fields.map(AnyValidatable.init).validate(inValidationMode: mode)
-    }
-}
-
-// MARK: Sequence extension
+// MARK: Sequence + makeFieldset
 
 extension Sequence where Element == FieldsetEntry {
     public func makeFieldset(inValidationMode mode: ValidationMode) throws -> Node {
@@ -60,5 +49,18 @@ extension Sequence where Element == FieldsetEntry {
             node[entry.key] = try entry.makeNode(in: context)
         }
         return node
+    }
+}
+
+// MARK: Sequence + validate
+
+extension Sequence where Element: ValidationModeValidatable {
+
+    /// Validates each field according to the validation mode.
+    /// Throws on first invalid field.
+    public func validate(inValidationMode mode: ValidationMode) throws {
+        guard mode != .none else { return }
+
+        try forEach { try $0.validate(inValidationMode: mode) }
     }
 }
