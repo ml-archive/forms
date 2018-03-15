@@ -4,25 +4,23 @@ public typealias FieldType = FieldsetEntryRepresentable &
     ValidationModeValidatable
 
 /// Types conforming to this protocol can be represented as a fieldset
-public protocol Form: FieldsetRepresentable, ValidationModeValidatable {
+public protocol Form: ValidationModeValidatable {
     var fields: [FieldType] { get }
 }
 
-// MARK: NodeRepresentable
-
 extension Form {
-
-    /// Creates a fieldset for use in an HTML form
-    public func makeNode(in context: Context? = nil) throws -> Node {
+    public func makeFieldset(
+        inValidationMode mode: ValidationMode
+    ) throws -> Node {
         return try fields
             .flatMap { $0.makeFieldsetEntry() }
-            .makeFieldset(in: context)
+            .makeFieldset(inValidationMode: mode)
     }
 }
 
 // MARK: ValidationModeValidatable
 
-extension Sequence where Element == ValidationModeValidatable {
+extension Sequence where Element: ValidationModeValidatable {
 
     /// Validates each field according to the validation mode.
     /// Throws on first invalid field.
@@ -33,17 +31,31 @@ extension Sequence where Element == ValidationModeValidatable {
     }
 }
 
+/// Helper for enabling batch validation of non-concrete `ValidationModeValidatable`s
+private struct AnyValidatable: ValidationModeValidatable {
+    let _validate: (ValidationMode) throws -> Void
+
+    init(_ v: ValidationModeValidatable) {
+        _validate = v.validate
+    }
+
+    func validate(inValidationMode mode: ValidationMode) throws {
+        try _validate(mode)
+    }
+}
+
 extension Form {
     public func validate(inValidationMode mode: ValidationMode) throws {
-        try fields.map { $0 as ValidationModeValidatable }.validate(inValidationMode: mode)
+        try fields.map(AnyValidatable.init).validate(inValidationMode: mode)
     }
 }
 
 // MARK: Sequence extension
 
 extension Sequence where Element == FieldsetEntry {
-    fileprivate func makeFieldset(in context: Context?) throws -> Node {
+    public func makeFieldset(inValidationMode mode: ValidationMode) throws -> Node {
         var node = Node([:])
+        let context = ValidationContext(mode: mode)
         for entry in self {
             node[entry.key] = try entry.makeNode(in: context)
         }
