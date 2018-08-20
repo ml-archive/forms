@@ -4,7 +4,7 @@ public typealias FieldType = FieldsetEntryRepresentable &
     ValidationModeValidatable
 
 /// Types conforming to this protocol can be represented as a fieldset
-public protocol Form: ValidationModeValidatable {
+public protocol Form: FieldsetRepresentable, ValidationModeValidatable {
     var fields: [FieldType] { get }
 }
 
